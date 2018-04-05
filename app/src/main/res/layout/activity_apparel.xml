@@ -4,29 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.testworkshop.prototype_2.MainActivity"
-    android:background="#fcfcfc">
+    android:background="#fcfcfc"
+    tools:context="com.testworkshop.prototype_2.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
-        android:layout_height="220dp"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="220dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingtoolbar"
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            app:layout_scrollFlags="exitUntilCollapsed|scroll"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_bg_f"
             app:contentScrim="?attr/colorPrimary"
-            app:title="Apparel"
-            app:expandedTitleMarginStart="48dp"
             app:expandedTitleMarginEnd="64dp"
-            android:background="@drawable/bg_f">
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="exitUntilCollapsed|scroll"
+            app:title="Apparel">
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolBarId"
-                app:layout_collapseMode="pin"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"/>
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin" />
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
