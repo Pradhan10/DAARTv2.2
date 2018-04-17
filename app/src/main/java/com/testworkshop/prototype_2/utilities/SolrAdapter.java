@@ -66,7 +66,7 @@ public class SolrAdapter extends RecyclerView.Adapter<SolrAdapter.SolrAdapterVie
     public class SolrAdapterViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imgIcon;
-        TextView textView_title, tv_area, tv_city, tv_rating;
+        TextView textView_title, tv_area, tv_city;
 
         public SolrAdapterViewHolder(View itemView) {
             super(itemView);

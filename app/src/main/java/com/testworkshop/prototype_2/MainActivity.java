@@ -26,14 +26,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        resultfromWatson();
         //check if logged in from twitter, if not goto login
         setContentView(R.layout.activity_main);
-        mrecyclerViewList = findViewById(R.id.recyclerView_list);
-        mrecyclerViewList.setLayoutManager(new LinearLayoutManager(this));
-        initData();
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mrecyclerViewList = findViewById(R.id.recyclerView_list);
         makeSolrSearchQuery();
+        mrecyclerViewList.setLayoutManager(new LinearLayoutManager(this));
         mrecyclerViewList.setAdapter(new SolrAdapter(arr));
+
         //TODO : 10 STEPS
         /*
         * 1 : Do personality analysis by hitting Watson URL and store result
@@ -67,20 +68,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getBaseContext(), "Couldn't load data, Deals from SQLite", Toast.LENGTH_SHORT).show();
     }
 
-    private void initData() {
-
-        arr = new SolrData[10];
-        arr[0] = new SolrData("Hotel Jivan Jyoti", "9th Mile, Kalimpong", "Rishi Road-Highway 12", "Kalimpong", "1 Star hotel");
-        arr[1] = new SolrData("OYO Hotel sagar", "New Kalimati Road, Kasidih, Sakchi", "Jamshedpur", "Jamshedpur", "1 Star hotel");
-        arr[2] = new SolrData("OYO 2578 Hotel Nirmal Haveli", "Opposite Nagarpalika, Near Pushkarna Bera", "Postal Colony", "Jaisalmer", "3 Star hotel");
-        arr[3] = new SolrData("Grand Kakinada by GRT Hotels ", "11-3-11 Veterinary Hospital road,Ramarao peta", "Cinema Road", "Kakinada", "3 Star hotel");
-        arr[4] = new SolrData("Hotel Gorakh Haveli", "Near Fort First Gate, Dhibbapara", "Near Jaisalmer Golden Fort", "Jaisalmer", "3 Star hotel");
-        arr[5] = new SolrData("Mohan Niwas", "High Court Colony, Jodhpur. Rajasthan", "Ratanada Petrol Pump", "Jodhpur", "1 Star hotel");
-        arr[6] = new SolrData("Hotel Navrang Kalka ", "SCO 44 - 45, New Grain Market, Kalka", "Near Kalka Railway Station", "Kalka", "2 Star hotel");
-        arr[7] = new SolrData("The Gopinivas Grand ", "2-18 A6, Near Seashore", " Kanyakumari", "Kanyakumari", "4 Star hotel");
-        arr[8] = new SolrData("Polo Inn Guest House", "90, 1st Polo, Mandar Road,", "Paota", "Jodhpur", "2 Star hotel");
-        arr[9] = new SolrData("Hotel The Vaishnodevi", "Opp: Petrol Pump Vaishno Devi, Katra", "Reasi Road", "Katra", "3 Star hotel");
-    }
 
     public class SolrQueryTask extends AsyncTask<URL, Void, String> {
 
@@ -109,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (solrSearchResults != null && !solrSearchResults.equals("")) {
                 // TODO (17) Call showJsonDataView if we have valid, non-null results
-//                showJsonDataView();
-//                mSearchResultsTextView.setText(githubSearchResults);
                 showJsonDataView(solrSearchResults);
                 Log.d("Result from URL", solrSearchResults);
             } else {
@@ -120,6 +105,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+//    private void resultfromWatson() {
+//
+//        arr = new SolrData[10];
+//        arr[0] = new SolrData("Hotel Jivan Jyoti", "9th Mile, Kalimpong", "Rishi Road-Highway 12", "Kalimpong", "1 Star hotel");
+//        arr[1] = new SolrData("OYO Hotel sagar", "New Kalimati Road, Kasidih, Sakchi", "Jamshedpur", "Jamshedpur", "1 Star hotel");
+//        arr[2] = new SolrData("OYO 2578 Hotel Nirmal Haveli", "Opposite Nagarpalika, Near Pushkarna Bera", "Postal Colony", "Jaisalmer", "3 Star hotel");
+//        arr[3] = new SolrData("Grand Kakinada by GRT Hotels ", "11-3-11 Veterinary Hospital road,Ramarao peta", "Cinema Road", "Kakinada", "3 Star hotel");
+//        arr[4] = new SolrData("Hotel Gorakh Haveli", "Near Fort First Gate, Dhibbapara", "Near Jaisalmer Golden Fort", "Jaisalmer", "3 Star hotel");
+//        arr[5] = new SolrData("Mohan Niwas", "High Court Colony, Jodhpur. Rajasthan", "Ratanada Petrol Pump", "Jodhpur", "1 Star hotel");
+//        arr[6] = new SolrData("Hotel Navrang Kalka ", "SCO 44 - 45, New Grain Market, Kalka", "Near Kalka Railway Station", "Kalka", "2 Star hotel");
+//        arr[7] = new SolrData("The Gopinivas Grand ", "2-18 A6, Near Seashore", " Kanyakumari", "Kanyakumari", "4 Star hotel");
+//        arr[8] = new SolrData("Polo Inn Guest House", "90, 1st Polo, Mandar Road,", "Paota", "Jodhpur", "2 Star hotel");
+//        arr[9] = new SolrData("Hotel The Vaishnodevi", "Opp: Petrol Pump Vaishno Devi, Katra", "Reasi Road", "Katra", "3 Star hotel");
+//
+//    }
 
 
 }

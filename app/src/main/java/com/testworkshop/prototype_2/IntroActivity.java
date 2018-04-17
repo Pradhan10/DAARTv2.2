@@ -18,7 +18,7 @@ public class IntroActivity extends AppIntro {
         // setContentView(R.layout.activity_intro);
         addSlide(IntroFragment.newInstance(R.layout.intro1));
 
-        setColorDoneText(0xffffff00);
+        setColorDoneText(0xaaffff00);
 
     }
 

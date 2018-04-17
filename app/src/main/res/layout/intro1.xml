@@ -46,7 +46,7 @@
         android:paddingLeft="34dp"
         android:paddingRight="34dp"
         android:text="Want to get the best deals on hotels? Login with Twitter and get deals on Hotels that are just curated for you!"
-        android:textColor="@color/cardview_shadow_end_color"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
     <TextView
