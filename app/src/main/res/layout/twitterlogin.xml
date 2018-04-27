@@ -10,12 +10,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible" />
-
 
         <TextView
             android:id="@+id/tv_inputLabel"
@@ -32,8 +26,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:maxHeight="130dp"
+            android:minLines="15"
+            android:scrollbars="vertical"
             android:layout_centerHorizontal="true"
             android:text="@string/large_text" />
+
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/button_analyse"
@@ -44,5 +49,14 @@
             android:layout_marginBottom="45dp"
             android:enabled="false"
             android:text="Analyse" />
+
+        <Button
+            android:id="@+id/button_showAnalysis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="45dp"
+            android:text="Show analysis" />
     </LinearLayout>
 </ScrollView>

@@ -17,10 +17,10 @@ import java.util.ArrayList;
 
 public class SolrAdapter extends RecyclerView.Adapter<SolrAdapter.SolrAdapterViewHolder> {
 
-    private SolrData[] data;
+    private ArrayList<HotelInfo> data;
     private ArrayList<Integer> images = new ArrayList<>();
 
-    public SolrAdapter(SolrData[] data) {
+    public SolrAdapter(ArrayList<HotelInfo> data) {
 
         this.data = data;
         images.add(R.drawable.zero_1);
@@ -46,11 +46,11 @@ public class SolrAdapter extends RecyclerView.Adapter<SolrAdapter.SolrAdapterVie
     @Override
     public void onBindViewHolder(SolrAdapterViewHolder holder, int position) {
 
-        String title = data[position].getAddress();
+        String title = data.get(position).getProperty_name();
         holder.textView_title.setText(title);
-        String area = data[position].getArea();
+        String area = data.get(position).getRoom_type();
         holder.tv_area.setText(area);
-        String city = data[position].getCity();
+        String city = data.get(position).getCity();
         holder.tv_city.setText(city);
         Integer imageID = images.get(position);
         holder.imgIcon.setImageResource(imageID);
@@ -60,7 +60,7 @@ public class SolrAdapter extends RecyclerView.Adapter<SolrAdapter.SolrAdapterVie
 
     @Override
     public int getItemCount() {
-        return data.length;
+        return data.size();
     }
 
     public class SolrAdapterViewHolder extends RecyclerView.ViewHolder {

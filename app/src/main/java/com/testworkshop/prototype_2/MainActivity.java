@@ -1,6 +1,6 @@
 package com.testworkshop.prototype_2;
 
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,18 +10,33 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.testworkshop.prototype_2.utilities.HotelInfo;
 import com.testworkshop.prototype_2.utilities.NetworkUtils;
 import com.testworkshop.prototype_2.utilities.SolrAdapter;
-import com.testworkshop.prototype_2.utilities.SolrData;
 
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    SolrData[] arr;
+    public final String TAG = "MainActivity";
     RecyclerView mrecyclerViewList;
     private ProgressBar mLoadingIndicator;
+    public ArrayList<HotelInfo> showHotels;
+    HotelInfo[] arr;
+    RequestQueue mRequestQueue;
+    private String startRange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +45,17 @@ public class MainActivity extends AppCompatActivity {
         //check if logged in from twitter, if not goto login
         setContentView(R.layout.activity_main);
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
         mrecyclerViewList = findViewById(R.id.recyclerView_list);
-        makeSolrSearchQuery();
-        mrecyclerViewList.setLayoutManager(new LinearLayoutManager(this));
-        mrecyclerViewList.setAdapter(new SolrAdapter(arr));
+
+        showHotels = new ArrayList<>();
+        /*Get solr search vlaue from intent*/
+        Intent intent = getIntent();
+        if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+            startRange = String.valueOf(intent.getIntExtra(Intent.EXTRA_TEXT, 0));
+        }
+        makeSolrSearchQuery(startRange);
+
 
         //TODO : 10 STEPS
         /*
@@ -44,18 +66,95 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void makeSolrSearchQuery(){
+    private void makeSolrSearchQuery(String startRange) {
         // TODO :4 Form query here using SQLite
-        URL solrSearchUrl = NetworkUtils.buildUrl("id", "SOLR1000");
+        URL solrSearchUrl = NetworkUtils.buildUrl("id", startRange);
         Log.d("URL", solrSearchUrl.toString());
-        new SolrQueryTask().execute(solrSearchUrl);
+
+        /*Try volley for fast network resp*/
+        // Instantiate the RequestQueue.
+        mRequestQueue = Volley.newRequestQueue(this);
+        String url = solrSearchUrl.toString();
+
+        // Start the queue
+        mRequestQueue.start();
+
+
+// Request a JSON response from the provided URL.
+
+        /*TODO 12223322 : Continue from here, refer chrominum*/
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                if (response != null) {
+//                    Log.d("URL res",response.toString());
+                    int status = response.optInt("status");
+                    if (status == 0) {
+                        try {
+                            JSONObject hotels = response.getJSONObject("response");
+                            JSONArray docs = hotels.getJSONArray("docs");
+                            if (docs != null) {
+
+                                for (int k = 0; k < docs.length(); k++) {
+                                    JSONObject hotelData = docs.getJSONObject(k);
+                                    HotelInfo hotelInfo = new HotelInfo();
+                                    hotelInfo.setCity(hotelData.getString("city"));
+                                    hotelInfo.setProperty_name(hotelData.getString("property_name"));
+                                    hotelInfo.setRoom_type(hotelData.getString("room_type"));
+
+                                    showHotels.add(k, hotelInfo);
+                                    Log.d("URL Hotels", hotelInfo.getProperty_name());
+                                }
+                                mrecyclerViewList.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+                                mrecyclerViewList.setAdapter(new SolrAdapter(showHotels));
+                            } else {
+                                Log.d("URL Hotels", "docs null");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        Log.d("URL Hotels", "status not zero");
+                    }
+                } else {
+                    Log.d("URL Hotels", "response null");
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("LOG", error.toString());
+                Log.d("URL error", error.toString());
+            }
+        });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+// Add the request to the RequestQueue.
+        mRequestQueue.add(jsonObjectRequest);
+        //new SolrQueryTask().execute(solrSearchUrl);
 
     }
 
 
+    protected void onStop() {
+        super.onStop();
+        if (mRequestQueue != null) {
+            mRequestQueue.cancelAll(TAG);
+        }
+    }
+
     private void showJsonDataView(String solrSearchResult) {
         // TODO : 8 Show data in cardView
-
+        try {
+            JSONObject solrSearchResultJSON = new JSONObject(solrSearchResult);
+            Log.d("URL jsonResult", solrSearchResultJSON.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         // Then, make sure the JSON data is visible
         Toast.makeText(getBaseContext(), solrSearchResult, Toast.LENGTH_SHORT).show();
     }
@@ -69,42 +168,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class SolrQueryTask extends AsyncTask<URL, Void, String> {
-
-        // COMPLETED (26) Override onPreExecute to set the loading indicator to visible
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String doInBackground(URL... params) {
-            URL searchUrl = params[0];
-            String solrSearchResults = null;
-            try {
-                solrSearchResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return solrSearchResults;
-        }
-
-        @Override
-        protected void onPostExecute(String solrSearchResults) {
-            // COMPLETED (27) As soon as the loading is complete, hide the loading indicator
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (solrSearchResults != null && !solrSearchResults.equals("")) {
-                // TODO (17) Call showJsonDataView if we have valid, non-null results
-                showJsonDataView(solrSearchResults);
-                Log.d("Result from URL", solrSearchResults);
-            } else {
-                // COMPLETED (16) Call showErrorMessage if the result is null in onPostExecute
-                showErrorMessage();
-                Log.d("Result from URL", "ERROR");
-            }
-        }
-    }
+//    public class SolrQueryTask extends AsyncTask<URL, Void, String> {
+//
+//        // COMPLETED (26) Override onPreExecute to set the loading indicator to visible
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            mLoadingIndicator.setVisibility(View.VISIBLE);
+//        }
+//
+//        @Override
+//        protected String doInBackground(URL... params) {
+//            URL searchUrl = params[0];
+//            String solrSearchResults = null;
+//            try {
+//                solrSearchResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return solrSearchResults;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String solrSearchResults) {
+//            // COMPLETED (27) As soon as the loading is complete, hide the loading indicator
+//            mLoadingIndicator.setVisibility(View.INVISIBLE);
+//            if (solrSearchResults != null && !solrSearchResults.equals("")) {
+//                // TODO (17) Call showJsonDataView if we have valid, non-null results
+//                showJsonDataView(solrSearchResults);
+//                Log.i("Result from URL", solrSearchResults);
+//            } else {
+//                // COMPLETED (16) Call showErrorMessage if the result is null in onPostExecute
+//                showErrorMessage();
+//                Log.i("Result from URL", "ERROR");
+//            }
+//        }
+//    }
 
 
 //    private void resultfromWatson() {

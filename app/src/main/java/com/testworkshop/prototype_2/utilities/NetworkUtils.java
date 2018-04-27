@@ -1,6 +1,7 @@
 package com.testworkshop.prototype_2.utilities;
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,20 +18,20 @@ public class NetworkUtils {
     //http://localhost:8983/solr/techproducts/select?q=*:*
     /*This url needs to be updated after every system shutdown, as we do not have static IP*/
     final static String SOLR_BASE_URL =
-            "http://192.168.1.7:8983/solr/gettingstarted/select?q=*:*";
+            "http://192.168.1.6:8983/solr/gettingstarted/select?q=*:*&rows=2";
 
+    final static String PARAM_SORT = "start";
 
     /**
      * Builds the URL used to query GitHub.
      *
-     * @param githubSearchQuery The keyword that will be queried for.
      * @return The URL to use to query the GitHub.
      */
     public static URL buildUrl(String SolrSearchQuery, String value) {
-        Uri builtUri = Uri.parse(SOLR_BASE_URL).buildUpon()
+        Uri builtUri = Uri.parse(SOLR_BASE_URL).buildUpon().appendQueryParameter(PARAM_SORT, value)
                 // TODO 5 : build specific query here by appending user pref
                 .build();
-
+        Log.d("URL buildUrl", builtUri.toString());
         URL url = null;
         try {
             url = new URL(builtUri.toString());
